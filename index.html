@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cosmic Creatures — Play the Beta</title>
+<meta name="description" content="Battle cosmic creatures in a turn-based roguelike. Join the beta on iPhone, iPad or Android.">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070a;
+    --ink: #f3ead8;
+    --dim: #a89f8e;
+    --gold: #d8b673;
+    --gold-hot: #f4de95;
+    --red: #e8343c;
+    --card: #121016;
+    --line: rgba(216, 182, 115, 0.28);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: radial-gradient(ellipse at 50% 0%, #1b1220 0%, var(--bg) 60%) fixed, var(--bg);
+    color: var(--ink);
+    font-family: "EB Garamond", Georgia, serif;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px 16px 48px;
+  }
+  main { width: 100%; max-width: 440px; text-align: center; }
+  .icon {
+    width: 132px; height: 132px; border-radius: 50%;
+    box-shadow: 0 0 0 2px #000, 0 0 0 4px var(--red), 0 0 48px rgba(232, 52, 60, 0.35);
+    display: block; margin: 0 auto 22px;
+  }
+  h1 {
+    font-family: "Cinzel", serif; font-weight: 900; letter-spacing: 0.06em;
+    font-size: clamp(30px, 9vw, 40px); margin: 0 0 6px; color: var(--gold-hot);
+  }
+  .tag { font-style: italic; color: var(--dim); font-size: 19px; margin: 0 0 30px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 18px; margin: 0 0 14px; text-align: left;
+  }
+  .card.mine { border-color: var(--gold); box-shadow: 0 0 24px rgba(216, 182, 115, 0.18); }
+  .card h2 {
+    font-family: "Cinzel", serif; font-weight: 700; font-size: 15px; letter-spacing: 0.14em;
+    margin: 0 0 12px; color: var(--gold);
+  }
+  .card p { margin: 0 0 12px; font-size: 17px; line-height: 1.4; color: var(--ink); }
+  .step { color: var(--dim); font-size: 15px; margin: 0 0 6px; }
+  a.btn {
+    display: block; text-align: center; text-decoration: none;
+    font-family: "Cinzel", serif; font-weight: 700; letter-spacing: 0.08em; font-size: 15px;
+    color: #1a1208; background: var(--gold); border-radius: 10px; padding: 14px 12px; margin: 0 0 10px;
+  }
+  a.btn:hover, a.btn:focus-visible { background: var(--gold-hot); outline: none; }
+  a.btn.ghost { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  a.btn.ghost:hover, a.btn.ghost:focus-visible { background: rgba(216, 182, 115, 0.12); }
+  .fine { color: var(--dim); font-size: 14px; margin-top: 22px; line-height: 1.5; }
+  .fine a { color: var(--gold); }
+</style>
+</head>
+<body>
+<main>
+  <img class="icon" src="icon.png" alt="Cosmic Creatures">
+  <h1>COSMIC CREATURES</h1>
+  <p class="tag">Battle cosmic creatures in a turn-based roguelike.</p>
+
+  <section class="card" id="apple">
+    <h2>IPHONE &amp; IPAD</h2>
+    <p>Play the beta through Apple’s TestFlight app.</p>
+    <a class="btn" href="https://testflight.apple.com/join/TXURDpMM">JOIN ON TESTFLIGHT</a>
+  </section>
+
+  <section class="card" id="android">
+    <h2>ANDROID</h2>
+    <p class="step">Step 1 — join the playtest group (one tap, with your Google account)</p>
+    <a class="btn ghost" href="https://groups.google.com/g/cosmic-creatures-playtest">JOIN THE PLAYTEST GROUP</a>
+    <p class="step">Step 2 — become a tester and install</p>
+    <a class="btn" href="https://play.google.com/apps/testing/com.bazookazac.cosmiccreatures">GET IT ON GOOGLE PLAY</a>
+  </section>
+
+  <p class="fine">By Zac &amp; Lisa · <a href="https://stellastonedesign.github.io/cosmic-creatures-privacy/">Privacy policy</a></p>
+</main>
+<script>
+  // Put the player's own platform first and light it — never a forced redirect (both stay one tap away).
+  (function () {
+    var ua = navigator.userAgent || "";
+    var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var android = /Android/i.test(ua);
+    var mine = ios ? "apple" : (android ? "android" : null);
+    if (!mine) return;
+    var el = document.getElementById(mine);
+    el.classList.add("mine");
+    if (mine === "android") el.parentNode.insertBefore(el, document.getElementById("apple"));
+  })();
+</script>
+</body>
+</html>

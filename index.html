@@ -2,93 +2,205 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cosmic Creatures — Play the Beta</title>
 <meta name="description" content="Battle cosmic creatures in a turn-based roguelike. Join the beta on iPhone, iPad or Android.">
+<meta name="theme-color" content="#0c0a14">
+<meta property="og:title" content="Cosmic Creatures — Play the Beta">
+<meta property="og:description" content="Battle cosmic creatures in a turn-based roguelike. Join the beta on iPhone, iPad or Android.">
+<meta property="og:image" content="https://stellastonedesign.github.io/cosmic-creatures/img/bg-wide-1600.webp">
 <link rel="icon" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="preload" as="image" href="img/title-gold.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #07070a;
-    --ink: #f3ead8;
-    --dim: #a89f8e;
-    --gold: #d8b673;
-    --gold-hot: #f4de95;
-    --red: #e8343c;
-    --card: #121016;
-    --line: rgba(216, 182, 115, 0.28);
+    --night: #0c0a14;
+    --ink: #f3e9d6;
+    --dim: #c9bba2;
+    --gold: #d6a85c;
+    --gold-hi: #f2d898;
+    --gold-lo: #9a6a2c;
+    --plate: rgba(12, 9, 20, .74);
+    --hair: rgba(214, 168, 92, .55);
+    --hair-soft: rgba(214, 168, 92, .22);
+    color-scheme: dark;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
+  html { background: var(--night); }
   body {
-    background: radial-gradient(ellipse at 50% 0%, #1b1220 0%, var(--bg) 60%) fixed, var(--bg);
+    min-height: 100vh; min-height: 100svh;
     color: var(--ink);
     font-family: "EB Garamond", Georgia, serif;
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 32px 16px 48px;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
-  main { width: 100%; max-width: 440px; text-align: center; }
-  .icon {
-    width: 132px; height: 132px; border-radius: 50%;
-    box-shadow: 0 0 0 2px #000, 0 0 0 4px var(--red), 0 0 48px rgba(232, 52, 60, 0.35);
-    display: block; margin: 0 auto 22px;
+
+  /* ── the painting: tall on phones, wide on landscape; a slow drift ── */
+  .sky { position: fixed; inset: 0; z-index: -3; overflow: hidden; background: var(--night); }
+  .sky picture, .sky img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .sky img { object-fit: cover; object-position: 50% 0%; transform-origin: 50% 30%; }
+  @media (orientation: landscape) { .sky img { object-position: 40% 30%; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .sky img { animation: drift 48s ease-in-out infinite alternate; }
+    @keyframes drift { from { transform: scale(1.02) translate3d(0, 0, 0); } to { transform: scale(1.09) translate3d(-1.2%, 1.2%, 0); } }
   }
-  h1 {
-    font-family: "Cinzel", serif; font-weight: 900; letter-spacing: 0.06em;
-    font-size: clamp(30px, 9vw, 40px); margin: 0 0 6px; color: var(--gold-hot);
+  /* a dusk that deepens toward the plates, so every word reads */
+  .veil { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(120% 70% at 50% 0%, rgba(12,10,20,.10), rgba(12,10,20,0) 60%),
+      linear-gradient(180deg, rgba(12,10,20,.25) 0%, rgba(12,10,20,0) 22%, rgba(12,10,20,0) 40%, rgba(12,10,20,.62) 64%, rgba(12,10,20,.92) 100%); }
+  @media (orientation: landscape) { .veil { background:
+      radial-gradient(60% 90% at 50% 45%, rgba(12,10,20,.55), rgba(12,10,20,0) 75%),
+      linear-gradient(180deg, rgba(12,10,20,.2) 0%, rgba(12,10,20,.0) 30%, rgba(12,10,20,.7) 100%); } }
+  canvas#motes { position: fixed; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
+
+  /* ── layout ── */
+  .page { width: 100%; max-width: 480px; margin: 0 auto; padding: max(28px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; align-items: center; text-align: center; }
+  /* THE HOME SCREEN'S TITLE (title.gd, the "ink" wordmark): gilded per word #FFF3C8 → #E7C87A → #9C7426, its black under-copy
+     two design px down at 60 %, a warm glow, and the game's light sweep — every 7 s, 1.1 s across, leaning. */
+  .logo { position: relative; width: min(92%, 420px); margin: 0; line-height: 0; }
+  .title { width: 100%; height: auto; display: block;
+    filter: drop-shadow(0 .6vw 0 rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(255, 200, 120, .30)) drop-shadow(0 8px 20px rgba(0,0,0,.75)); }
+  @media (min-width: 700px) { .title { filter: drop-shadow(0 5px 0 rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(255, 200, 120, .30)) drop-shadow(0 8px 20px rgba(0,0,0,.75)); } }
+  .sheen { position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    -webkit-mask: url(img/title-mask.webp) center / 100% 100% no-repeat; mask: url(img/title-mask.webp) center / 100% 100% no-repeat; }
+  .sheen::before { content: ""; position: absolute; top: -10%; bottom: -10%; width: 16%; left: -30%;
+    background: linear-gradient(90deg, rgba(255,248,225,0), rgba(255,248,225,.85) 50%, rgba(255,248,225,0)); transform: skewX(-31deg); }
+  @media (prefers-reduced-motion: no-preference) {
+    .sheen::before { animation: titlesweep 7s linear 1.6s infinite; }
+    @keyframes titlesweep { 0% { left: -30%; } 15.7% { left: 125%; } 100% { left: 125%; } }
   }
-  .tag { font-style: italic; color: var(--dim); font-size: 19px; margin: 0 0 30px; }
-  .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 20px 18px; margin: 0 0 14px; text-align: left;
+  .tag { margin: 14px 0 0; font-style: italic; font-size: clamp(18px, 4.6vw, 21px); color: var(--ink);
+    text-shadow: 0 2px 12px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.9); max-width: 30ch; }
+  .gap { flex: none; height: 34vh; height: 34svh; }
+  @media (orientation: landscape) { .gap { height: 14vh; } }
+
+  /* the ornament: a gold rule pierced by the nine-pointed star */
+  .rule { display: flex; align-items: center; gap: 12px; width: min(100%, 320px); margin: 6px auto 18px; color: var(--gold); }
+  .rule::before, .rule::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold)); }
+  .rule::after { background: linear-gradient(90deg, var(--gold), transparent); }
+  .rule svg { width: 18px; height: 18px; filter: drop-shadow(0 0 6px rgba(242,216,152,.6)); }
+  .lead { margin: 0; font-family: Cinzel, serif; font-weight: 700; font-size: 13px; letter-spacing: .32em; text-transform: uppercase;
+    color: var(--gold-hi); text-shadow: 0 2px 10px rgba(0,0,0,.95); }
+
+  /* ── the plates ── */
+  .plate { position: relative; width: 100%; margin: 0 0 22px; padding: 26px 20px 20px; text-align: left;
+    background: var(--plate); -webkit-backdrop-filter: blur(7px) saturate(1.1); backdrop-filter: blur(7px) saturate(1.1);
+    border: 1px solid var(--hair); border-radius: 4px;
+    box-shadow: inset 0 0 0 4px rgba(12,9,20,.6), inset 0 0 0 5px var(--hair-soft), 0 18px 40px rgba(0,0,0,.55); }
+  .plate.mine { border-color: var(--gold-hi); box-shadow: inset 0 0 0 4px rgba(12,9,20,.6), inset 0 0 0 5px rgba(242,216,152,.35),
+    0 0 34px rgba(242,196,120,.22), 0 18px 40px rgba(0,0,0,.55); }
+  /* the wax-seal star on the plate's crown */
+  .seal { position: absolute; top: -13px; left: 50%; width: 26px; height: 26px; margin-left: -13px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 40%, #2a1f33, #0c0a14 70%); border: 1px solid var(--hair); display: grid; place-items: center; color: var(--gold); }
+  .seal svg { width: 15px; height: 15px; }
+  .plate.mine .seal { color: var(--gold-hi); border-color: var(--gold-hi); }
+  /* corner flourishes */
+  .plate i { position: absolute; width: 14px; height: 14px; border-color: var(--gold); border-style: solid; opacity: .85; }
+  .plate i:nth-of-type(1) { top: 7px; left: 7px; border-width: 1px 0 0 1px; }
+  .plate i:nth-of-type(2) { top: 7px; right: 7px; border-width: 1px 1px 0 0; }
+  .plate i:nth-of-type(3) { bottom: 7px; left: 7px; border-width: 0 0 1px 1px; }
+  .plate i:nth-of-type(4) { bottom: 7px; right: 7px; border-width: 0 1px 1px 0; }
+  .plate h2 { margin: 0 0 4px; text-align: center; font-family: Cinzel, serif; font-weight: 800; font-size: 17px; letter-spacing: .2em;
+    background: linear-gradient(180deg, var(--gold-hi), var(--gold) 60%, var(--gold-lo)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .plate .sub { margin: 0 0 16px; text-align: center; color: var(--dim); font-size: 17px; line-height: 1.35; }
+  .step { margin: 0 0 7px; color: var(--dim); font-size: 15.5px; line-height: 1.35; }
+  .step b { font-family: Cinzel, serif; font-weight: 700; font-size: 12px; letter-spacing: .18em; color: var(--gold); margin-right: 6px; }
+
+  /* the engraved plaque */
+  a.btn { position: relative; overflow: hidden; display: block; text-align: center; text-decoration: none;
+    font-family: Cinzel, serif; font-weight: 800; letter-spacing: .14em; font-size: 14.5px;
+    color: #1d1206; padding: 15px 12px; margin: 0 0 12px; border-radius: 3px;
+    background: linear-gradient(180deg, #f6e1a6 0%, #e2bd72 45%, #c6974a 55%, #a87632 100%);
+    border: 1px solid #f8e7b4;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 0 rgba(90,55,15,.45), 0 6px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.45);
+    text-shadow: 0 1px 0 rgba(255,240,200,.55); transition: transform .15s, box-shadow .2s, filter .2s; }
+  a.btn:hover { filter: brightness(1.07); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -2px 0 rgba(90,55,15,.45), 0 8px 26px rgba(0,0,0,.6), 0 0 22px rgba(242,196,120,.35), 0 0 0 1px rgba(0,0,0,.45); }
+  a.btn:active { transform: translateY(1px); }
+  a.btn:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: 4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    a.btn::after { content: ""; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%;
+      background: linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent); transform: skewX(-18deg);
+      animation: sheen 6.5s ease-in-out infinite; }
+    .plate:nth-of-type(2) a.btn::after { animation-delay: 1.4s; }
+    @keyframes sheen { 0%, 70% { left: -60%; } 88%, 100% { left: 130%; } }
   }
-  .card.mine { border-color: var(--gold); box-shadow: 0 0 24px rgba(216, 182, 115, 0.18); }
-  .card h2 {
-    font-family: "Cinzel", serif; font-weight: 700; font-size: 15px; letter-spacing: 0.14em;
-    margin: 0 0 12px; color: var(--gold);
+  a.btn.ghost { background: rgba(12,9,20,.35); color: var(--gold-hi); border: 1px solid var(--gold); text-shadow: none;
+    box-shadow: inset 0 0 0 1px rgba(242,216,152,.12), 0 6px 18px rgba(0,0,0,.45); }
+  a.btn.ghost::after { display: none; }
+  a.btn.ghost:hover { background: rgba(214,168,92,.14); }
+
+  .free { margin: 4px 0 26px; color: var(--ink); font-size: 16px; text-shadow: 0 2px 10px rgba(0,0,0,.95); }
+  .free em { color: var(--gold-hi); font-style: normal; }
+  footer { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--dim); font-size: 14px; }
+  footer .made { font-family: Cinzel, serif; font-weight: 700; font-size: 11.5px; letter-spacing: .3em; color: var(--gold); }
+  footer a { color: var(--gold-hi); }
+  /* a wide screen: the column stands to the right, the dragon flies free across the left two-thirds */
+  @media (min-width: 900px) and (orientation: landscape) {
+    .page { margin: 0 max(4vw, calc((100vw - 1500px) / 2)) 0 auto; padding-top: 5vh; }
+    .gap { height: 4vh; }
+    .sky img { object-position: 58% 35%; }
+    .veil { background:
+      linear-gradient(90deg, rgba(12,10,20,0) 40%, rgba(12,10,20,.55) 72%, rgba(12,10,20,.8) 100%),
+      linear-gradient(180deg, rgba(12,10,20,.15) 0%, rgba(12,10,20,0) 30%, rgba(12,10,20,.55) 100%); }
   }
-  .card p { margin: 0 0 12px; font-size: 17px; line-height: 1.4; color: var(--ink); }
-  .step { color: var(--dim); font-size: 15px; margin: 0 0 6px; }
-  a.btn {
-    display: block; text-align: center; text-decoration: none;
-    font-family: "Cinzel", serif; font-weight: 700; letter-spacing: 0.08em; font-size: 15px;
-    color: #1a1208; background: var(--gold); border-radius: 10px; padding: 14px 12px; margin: 0 0 10px;
-  }
-  a.btn:hover, a.btn:focus-visible { background: var(--gold-hot); outline: none; }
-  a.btn.ghost { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
-  a.btn.ghost:hover, a.btn.ghost:focus-visible { background: rgba(216, 182, 115, 0.12); }
-  .fine { color: var(--dim); font-size: 14px; margin-top: 22px; line-height: 1.5; }
-  .fine a { color: var(--gold); }
 </style>
 </head>
 <body>
-<main>
-  <img class="icon" src="icon.png" alt="Cosmic Creatures">
-  <h1>COSMIC CREATURES</h1>
+<div class="sky" aria-hidden="true">
+  <picture>
+    <source media="(orientation: landscape)" srcset="img/bg-wide-1600.webp 1600w, img/bg-wide.webp 2400w" sizes="100vw">
+    <img src="img/bg-tall.webp" srcset="img/bg-tall-800.webp 800w, img/bg-tall.webp 1200w" sizes="100vw" alt="" fetchpriority="high">
+  </picture>
+</div>
+<div class="veil" aria-hidden="true"></div>
+<canvas id="motes" aria-hidden="true"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="s9" viewBox="-50 -50 100 100"><polygon fill="currentColor" points="0.00,-48.00 7.55,-20.75 30.85,-36.77 19.12,-11.04 47.27,-8.34 21.74,3.83 41.57,24.00 14.19,16.91 16.42,45.11 0.00,22.08 -16.42,45.11 -14.19,16.91 -41.57,24.00 -21.74,3.83 -47.27,-8.34 -19.12,-11.04 -30.85,-36.77 -7.55,-20.75"/></symbol>
+</defs></svg>
+
+<div class="page">
+  <h1 class="logo"><img class="title" src="img/title-gold.webp" width="1024" height="409" alt="Cosmic Creatures"><span class="sheen" aria-hidden="true"></span></h1>
   <p class="tag">Battle cosmic creatures in a turn-based roguelike.</p>
 
-  <section class="card" id="apple">
+  <div class="gap" aria-hidden="true"></div>
+
+  <div class="rule" aria-hidden="true"><svg><use href="#s9"/></svg></div>
+  <p class="lead">Join the beta</p>
+  <div class="rule" aria-hidden="true" style="margin-top:18px"><svg><use href="#s9"/></svg></div>
+
+  <section class="plate" id="apple">
+    <span class="seal" aria-hidden="true"><svg><use href="#s9"/></svg></span><i></i><i></i><i></i><i></i>
     <h2>IPHONE &amp; IPAD</h2>
-    <p>Play the beta through Apple’s TestFlight app.</p>
+    <p class="sub">Play through Apple’s TestFlight app.</p>
     <a class="btn" href="https://testflight.apple.com/join/TXURDpMM">JOIN ON TESTFLIGHT</a>
   </section>
 
-  <section class="card" id="android">
+  <section class="plate" id="android">
+    <span class="seal" aria-hidden="true"><svg><use href="#s9"/></svg></span><i></i><i></i><i></i><i></i>
     <h2>ANDROID</h2>
-    <p class="step">Step 1 — join the playtest group (one tap, with your Google account)</p>
+    <p class="step"><b>I.</b>Join the playtest group with your Google account.</p>
     <a class="btn ghost" href="https://groups.google.com/g/cosmic-creatures-playtest">JOIN THE PLAYTEST GROUP</a>
-    <p class="step">Step 2 — become a tester and install</p>
+    <p class="step"><b>II.</b>Become a tester and install.</p>
     <a class="btn" href="https://play.google.com/apps/testing/com.bazookazac.cosmiccreatures">GET IT ON GOOGLE PLAY</a>
   </section>
 
-  <p class="fine">A BAZOOKA ZAC PRODUCTION · <a href="https://stellastonedesign.github.io/cosmic-creatures-privacy/">Privacy policy</a></p>
-</main>
+  <p class="free"><em>Free to play</em> · no ads · no loot boxes</p>
+
+  <footer>
+    <span class="made">A BAZOOKA ZAC PRODUCTION</span>
+    <a href="https://stellastonedesign.github.io/cosmic-creatures-privacy/">Privacy policy</a>
+  </footer>
+</div>
+
 <script>
-  // Put the player's own platform first and light it — never a forced redirect (both stay one tap away).
+  // Your own platform first and lit — never a forced redirect (both stay one tap away).
   (function () {
     var ua = navigator.userAgent || "";
     var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -98,6 +210,47 @@
     var el = document.getElementById(mine);
     el.classList.add("mine");
     if (mine === "android") el.parentNode.insertBefore(el, document.getElementById("apple"));
+  })();
+
+  // Embers rising from the valley and stars breathing in the high sky. Calm on purpose; off for reduced motion.
+  (function () {
+    var c = document.getElementById("motes");
+    if (!c || !c.getContext) return;
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var x = c.getContext("2d"), W = 0, H = 0, dpr = 1, stars = [], embers = [], last = 0;
+    function size() {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = c.clientWidth; H = c.clientHeight; c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
+      stars = []; var n = Math.round(W * H / 9000);
+      for (var i = 0; i < n; i++) stars.push({ x: Math.random() * W, y: Math.random() * H * 0.45, r: Math.random() * 1.1 + 0.3, p: Math.random() * 6.28, s: 0.6 + Math.random() * 1.4 });
+      embers = []; var m = Math.round(Math.min(46, W / 12));
+      for (var j = 0; j < m; j++) embers.push(spawn(true));
+    }
+    function spawn(any) {
+      return { x: Math.random() * W, y: any ? H * (0.45 + Math.random() * 0.6) : H + 10, v: 8 + Math.random() * 22, d: (Math.random() - 0.5) * 10,
+        r: Math.random() * 1.6 + 0.6, life: 0, max: 6 + Math.random() * 8, hue: 18 + Math.random() * 24 };
+    }
+    function frame(t) {
+      var dt = Math.min(0.05, (t - (last || t)) / 1000); last = t;
+      x.clearRect(0, 0, W, H);
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i]; var a = 0.35 + 0.35 * Math.sin(t / 1000 * s.s + s.p);
+        x.globalAlpha = a; x.fillStyle = "#fff6e6"; x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.283); x.fill();
+      }
+      for (var j = 0; j < embers.length; j++) {
+        var e = embers[j]; e.life += dt; e.y -= e.v * dt; e.x += Math.sin(e.life * 1.3 + j) * e.d * dt;
+        var k = e.life / e.max; if (k >= 1 || e.y < -10) { embers[j] = spawn(false); continue; }
+        x.globalAlpha = Math.sin(Math.PI * k) * 0.75;
+        var g = x.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.r * 4);
+        g.addColorStop(0, "hsla(" + e.hue + ",100%,72%,1)"); g.addColorStop(1, "hsla(" + e.hue + ",100%,55%,0)");
+        x.fillStyle = g; x.beginPath(); x.arc(e.x, e.y, e.r * 4, 0, 6.283); x.fill();
+      }
+      x.globalAlpha = 1;
+      if (!document.hidden) requestAnimationFrame(frame); else last = 0;
+    }
+    size(); addEventListener("resize", size);
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) requestAnimationFrame(frame); });
+    requestAnimationFrame(frame);
   })();
 </script>
 </body>
